@@ -1,17 +1,35 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlotBars : MonoBehaviour {
 
-    private float bar_gap = 0.03f;
-    private float initial_pos = -0.45f;  //locally, its starting 0.1 from the y axis //because y axis is at -0.5
+    private float bar_gap = 0.065f;
+    private float initial_pos = -0.4f;  //locally, its starting 0.1 from the y axis //because y axis is at -0.5
     private float bottomAxisPos;
 
     private int ticks = 5;
     private int eachSegHeight;
 
-    Dictionary<string, float> data_set;
+    private string[] titles;
+
+    [Tooltip("Setting enables reading data from csv file")]
+    public bool ReadFromCSV = false;
+
+    public static Dictionary<string, float> data_set;
+
+    [Serializable]
+    public struct DataVariable
+    {
+        [Tooltip("The Variable name.")]
+        public string data_name;
+        [Tooltip("The Value for the Variable.")]
+        public float data_value;
+    }
+
+    [Tooltip("The array of data values created.")]
+    public DataVariable[] dataSetArray;
 
     // Use this for initialization
     void Start () {
@@ -21,35 +39,8 @@ public class PlotBars : MonoBehaviour {
         bottomAxisPos = centerPos.y - extents.y;
         //Debug.Log(centerPos.y - extents.y);
 
-        data_set = new Dictionary<string, float>();
-        data_set.Add("Alexandra's Mist", 51.8f);
-        data_set.Add("Axe Capital", 32.4f);
-        data_set.Add("Caribbean Cowboy", 48.2f);
-        data_set.Add("Cass's Dovehunt", 40f);
-        data_set.Add("Chessen", 39.6f);
-        data_set.Add("Pemps Cowboy", 28.2f);
-        data_set.Add("Mind body soul", 50f);
-        data_set.Add("Axe", 32.4f);
-        data_set.Add("Cowboy", 48.2f);
-        data_set.Add("Dovehunt", 40f);
-        //data_set.Add("Caribbean", 48.2f);     //Extra data just to test
-        //data_set.Add("Cass's", 40f);
-        //data_set.Add("sen", 39.6f);
-        //data_set.Add("Pemp", 28.2f);
-        //data_set.Add("Mind", 50f);
-        //data_set.Add("Dohunt", 40f);
-        //data_set.Add("Cabbean", 48.2f);
-        //data_set.Add("ss's", 40f);
-        //data_set.Add("s", 39.6f);
-        //data_set.Add("Pep", 28.2f);
-        //data_set.Add("Min", 50f);
-        //data_set.Add("'s Mist", 51.8f);
-        //data_set.Add("A", 32.4f);
-        //data_set.Add("B", 48.2f);
-        //data_set.Add("C", 40f);
-        //data_set.Add("D", 39.6f);
-        //data_set.Add("E", 28.2f);
-
+        addToDictionary();
+        
         if (data_set.Count < 7)
             plotGraph();
         else
@@ -57,7 +48,61 @@ public class PlotBars : MonoBehaviour {
 
     }
 
-    void plotGraph()
+    private void addToDictionary()
+    {
+        data_set = new Dictionary<string, float>();
+        titles = new string[2];
+
+        if (!ReadFromCSV)
+        {
+            titles[0] = "Horse Name";
+            titles[1] = "Average BSF";
+            //Adding items from the dataSetArray (data taken when added in inspector)
+            //for (int i=0; i < dataSetArray.Length; i++)
+            //{
+            //    string name = dataSetArray[i].data_name;
+            //    float value = dataSetArray[i].data_value;
+            //    data_set.Add(name, value);
+            //}
+
+            //Adding data into dictionary manually
+            data_set.Add("Alexandra's Mist", 51.8f);
+            data_set.Add("Axe Capital", 32.4f);
+            data_set.Add("Caribbean Cowboy", 48.2f);
+            data_set.Add("Cass's Dovehunt", 40f);
+            data_set.Add("Chessen", 39.6f);
+            data_set.Add("Pemps Cowboy", 28.2f);
+            data_set.Add("Mind body soul", 50f);
+            data_set.Add("Axe", 32.4f);
+            data_set.Add("Cowboy", 48.2f);
+            data_set.Add("Dovehunt", 40f);
+            //data_set.Add("Caribbean", 48.2f);     //Extra data just to test
+            //data_set.Add("Cass's", 40f);
+            //data_set.Add("sen", 39.6f);
+            //data_set.Add("Pemp", 28.2f);
+            //data_set.Add("Mind", 50f);
+            //data_set.Add("Dohunt", 40f);
+            //data_set.Add("Cabbean", 48.2f);
+            //data_set.Add("ss's", 40f);
+            //data_set.Add("s", 39.6f);
+            //data_set.Add("Pep", 28.2f);
+            //data_set.Add("Min", 50f);
+            //data_set.Add("'s Mist", 51.8f);
+            //data_set.Add("A", 32.4f);
+            //data_set.Add("B", 48.2f);
+            //data_set.Add("C", 40f);
+            //data_set.Add("D", 39.6f);
+            //data_set.Add("E", 28.2f);
+        }
+        else
+        {
+            ReadCSV csvObj = new ReadCSV();
+            titles = csvObj.AddIntoDictionary();
+        }
+
+    }
+
+    private void plotGraph()
     {
         int yMin = 0;
         int yMax = calculateAxis();
@@ -92,11 +137,12 @@ public class PlotBars : MonoBehaviour {
         }
     }
 
-    void plotSmallerGraph()
+    private void plotSmallerGraph()
     {
         Debug.Log("Executing bigger graph");
         int yMin = 0;
         int yMax = calculateAxis();
+        initial_pos = -0.45f;
 
         //need to recalculate bar_gap and barWidth based on number of items
         float barWidth = CalculateBarWidth();
@@ -125,7 +171,8 @@ public class PlotBars : MonoBehaviour {
         }
     }
 
-    float CalculateBarWidth()
+    //Incase more than 6 dataValues are present; accordingly shortedn the barWidth and bar_gap
+    private float CalculateBarWidth()
     {
         float bar_width = 0.1f;
         int count = data_set.Count;
@@ -134,7 +181,7 @@ public class PlotBars : MonoBehaviour {
 
         //After simplifying above expression,
         bar_width = (float) (0.95 / (count * 1.5));
-        Debug.Log(bar_width);
+        //Debug.Log(bar_width);
 
         //Need to change bar_gap value
         bar_gap = (float) (bar_width / 2.0);
@@ -143,7 +190,7 @@ public class PlotBars : MonoBehaviour {
     }
 
     // To Calculate the MAximum height of the Y Axis
-    int calculateAxis()
+    private int calculateAxis()
     {
         int yMax = 2;
         float upperBound = 0.0f, lowerBound = 0.0f;

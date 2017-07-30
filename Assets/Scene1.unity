@@ -120,6 +120,7 @@ GameObject:
   - component: {fileID: 112249052}
   - component: {fileID: 112249051}
   - component: {fileID: 112249055}
+  - component: {fileID: 112249050}
   m_Layer: 0
   m_Name: XYAxisBox
   m_TagString: Untagged
@@ -127,6 +128,18 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &112249050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 112249049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 348bdd2a0bae3e941b43fb5c444555a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  relativeFilePath: 
 --- !u!23 &112249051
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -202,6 +215,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c8424ed814c4b54b864410f72f86a05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ReadFromCSV: 1
+  dataSetArray:
+  - data_name: A
+    data_value: 52.6
+  - data_name: B
+    data_value: 98.3
+  - data_name: C
+    data_value: 45.2
+  - data_name: D
+    data_value: 98.1
+  - data_name: E
+    data_value: 10
+  - data_name: F
+    data_value: 190.9
+  - data_name: G
+    data_value: 88
+  - data_name: H
+    data_value: 77.7
 --- !u!1001 &206427596
 Prefab:
   m_ObjectHideFlags: 0
@@ -462,6 +493,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c8424ed814c4b54b864410f72f86a05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ReadFromCSV: 0
+  dataSetArray: []
 --- !u!65 &1683771140
 BoxCollider:
   m_ObjectHideFlags: 0
