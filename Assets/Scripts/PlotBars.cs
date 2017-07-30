@@ -6,6 +6,7 @@ public class PlotBars : MonoBehaviour {
 
     private float bar_gap = 0.16f;
     private float initial_pos = -0.4f;
+    private float bottomAxisPos;
 
     private int ticks = 5;
     private int eachSegHeight;
@@ -14,6 +15,11 @@ public class PlotBars : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+
+        var centerPos = this.gameObject.GetComponent<Renderer>().bounds.center;
+        var extents = this.gameObject.GetComponent<Renderer>().bounds.extents;
+        bottomAxisPos = centerPos.y - extents.y;
+        //Debug.Log(centerPos.y - extents.y);
 
         data_set = new Dictionary<string, float>();
         data_set.Add("Alexandra's Mist", 51.8f);
@@ -41,11 +47,20 @@ public class PlotBars : MonoBehaviour {
 
             float bar_height = item.Value / yMax;
 
-            Vector3 cubePos = new Vector3(initial_pos, 0f, -0.2f);
+            
             Vector3 cubeScale = new Vector3(0.1f, bar_height, 1.0f);
-
-            bar.transform.localPosition = cubePos;
             bar.transform.localScale = cubeScale;
+
+            //To position  the bar on top of X axis
+            var barSize = bar.GetComponent<Renderer>().bounds.size;
+            var barExtents = bar.GetComponent<Renderer>().bounds.extents;
+            var temp = barSize.y + bottomAxisPos;
+            //Debug.Log(barExtents.y);
+
+            var yPos = temp - barExtents.y;
+            Vector3 cubePos = new Vector3(initial_pos, yPos, -0.2f);
+            bar.transform.localPosition = cubePos;
+            
 
             initial_pos = initial_pos + bar_gap;
         }
