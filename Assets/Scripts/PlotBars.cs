@@ -5,6 +5,13 @@ using UnityEngine;
 
 public class PlotBars : MonoBehaviour {
 
+    public static PlotBars instance;
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
     private float bar_gap = 0.065f;
     private float initial_pos = -0.4f;  //locally, its starting 0.1 from the y axis //because y axis is at -0.5
     private float bottomAxisPos;
@@ -19,9 +26,9 @@ public class PlotBars : MonoBehaviour {
     Material offFocusMaterial;
 
     [Tooltip("Setting enables reading data from csv file")]
-    public bool ReadFromCSV = false;
+    public bool ReadFromCSV = true;
 
-    public static Dictionary<string, float> data_set;
+    Dictionary<string, float> local_data_set;
 
     [Serializable]
     public struct DataVariable
@@ -32,8 +39,12 @@ public class PlotBars : MonoBehaviour {
         public float data_value;
     }
 
-    [Tooltip("The array of data values created.")]
+    [Tooltip("The array of data values created. (Only when ReadFromCSV = false)")]
     public DataVariable[] dataSetArray;
+
+    [Tooltip("X, Y Titles for the bar graph")]
+    public string XAxisTitle;
+    public string YAxisTitle;
 
     // Use this for initialization
     void Start () {
@@ -43,70 +54,41 @@ public class PlotBars : MonoBehaviour {
         bottomAxisPos = centerPos.y - extents.y;
         //Debug.Log(centerPos.y - extents.y);
 
-        addToDictionary();
+        AddToDictionary();
 
         yMax = calculateAxis();
         drawAxis();
-        //DrawAxisLabels dxObj = new DrawAxisLabels(ticks, yMax);
-        //dxObj.drawAxis();   //Creates Axis and labels
 
-        if (data_set.Count < 7)
+        if (local_data_set.Count < 7)
             plotGraph();
         else
             plotSmallerGraph();
-
     }
 
-    private void addToDictionary()
+    private void AddToDictionary()
     {
-        data_set = new Dictionary<string, float>();
         titles = new string[2];
 
-        if (!ReadFromCSV)
+        if (ReadFromCSV)
         {
-            titles[0] = "Horse Name";
-            titles[1] = "Average BSF";
-            //Adding items from the dataSetArray (data taken when added in inspector)
-            //for (int i=0; i < dataSetArray.Length; i++)
-            //{
-            //    string name = dataSetArray[i].data_name;
-            //    float value = dataSetArray[i].data_value;
-            //    data_set.Add(name, value);
-            //}
 
-            //Adding data into dictionary manually
-            data_set.Add("Alexandra's Mist", 40f);
-            data_set.Add("Axe Capital", 35f);
-            data_set.Add("Caribbean Cowboy", 15f);
-            data_set.Add("Cass's Dovehunt", 20f);
-            data_set.Add("Chessen", 25f);
-            data_set.Add("Pemps Cowboy", 30f);
-            data_set.Add("Mind body soul", 5f);
-            data_set.Add("Axe", 120.4f);
-            data_set.Add("Cowboy", 48.2f);
-            //data_set.Add("Dovehunt", 40f);
-            //data_set.Add("Caribbean", 48.2f);     //Extra data just to test
-            //data_set.Add("Cass's", 40f);
-            //data_set.Add("sen", 39.6f);
-            //data_set.Add("Pemp", 28.2f);
-            //data_set.Add("Mind", 50f);
-            //data_set.Add("Dohunt", 40f);
-            //data_set.Add("Cabbean", 48.2f);
-            //data_set.Add("ss's", 40f);
-            //data_set.Add("s", 39.6f);
-            //data_set.Add("Pep", 28.2f);
-            //data_set.Add("Min", 50f);
-            //data_set.Add("'s Mist", 51.8f);
-            //data_set.Add("A", 32.4f);
-            //data_set.Add("B", 48.2f);
-            //data_set.Add("C", 40f);
-            //data_set.Add("D", 39.6f);
-            //data_set.Add("E", 28.2f);
+            local_data_set = ReadCSV.instance.returnOriginalDataSet();
+            titles = ReadCSV.instance.returnTitles();
         }
         else
         {
-            ReadCSV csvObj = new ReadCSV();
-            titles = csvObj.AddIntoDictionary();
+            titles[0] = XAxisTitle;
+            titles[1] = YAxisTitle;
+            //Adding items from the dataSetArray (data taken when added in inspector)
+            for (int i = 0; i < dataSetArray.Length; i++)
+            {
+                string name = dataSetArray[i].data_name;
+                float value = dataSetArray[i].data_value;
+                local_data_set.Add(name, value);
+            }
+
+            ReadCSV.instance.titles = titles;
+            ReadCSV.instance.data_set = local_data_set;
         }
 
     }
@@ -149,14 +131,15 @@ public class PlotBars : MonoBehaviour {
         //Debug.Log(yMax);
         float barWidth = 0.1f;
 
-        foreach (var item in data_set)
+        foreach (var item in local_data_set)
         {
             //Debug.Log(item.Key + "  " + item.Value);
             GameObject bar = GameObject.CreatePrimitive(PrimitiveType.Cube);
             bar.transform.parent = this.gameObject.transform;
-            bar.name = item.Key + " with " + titles[1] + ": " + item.Value;
+            bar.name = item.Key; // + " with " + titles[1] + ": " + item.Value;
             bar.tag = "Bar";
             bar.GetComponent<Renderer>().material = offFocusMaterial;
+            bar.AddComponent<editComponent>();
 
             float bar_height = item.Value / yMax;
             
@@ -168,7 +151,6 @@ public class PlotBars : MonoBehaviour {
             var yPos = -0.5f + (bar_height / 2);
             Vector3 cubePos = new Vector3(initial_pos, yPos, -0.2f);
             bar.transform.localPosition = cubePos;
-            
 
             initial_pos = initial_pos + bar_gap + barWidth;
         }
@@ -182,11 +164,11 @@ public class PlotBars : MonoBehaviour {
         float barWidth = CalculateBarWidth();
         initial_pos = -0.45f + bar_gap;
 
-        foreach (var item in data_set)
+        foreach (var item in local_data_set)
         {
             GameObject bar = GameObject.CreatePrimitive(PrimitiveType.Cube);
             bar.transform.parent = this.gameObject.transform;
-            bar.name = item.Key + " with " + titles[1] + ": " + item.Value; 
+            bar.name = item.Key;  //+ " with " + titles[1] + ": " + item.Value; 
             bar.tag = "Bar";
             bar.GetComponent<Renderer>().material = offFocusMaterial;
             bar.AddComponent<editComponent>();
@@ -209,7 +191,7 @@ public class PlotBars : MonoBehaviour {
     private float CalculateBarWidth()
     {
         float bar_width = 0.1f;
-        int count = data_set.Count;
+        int count = local_data_set.Count;
         //Formula->   (count*bar_width) + (count*bar_gap) = 0.9     //0.9 because, initially, we use 0.1 to have a gap between yAxis and first bar.
         //And bar_gap = bar_width/2
 
@@ -229,7 +211,7 @@ public class PlotBars : MonoBehaviour {
         int yMax = 2;
         float upperBound = 0.0f, lowerBound = 0.0f;
 
-        foreach (var item in data_set)
+        foreach (var item in local_data_set)
         {
             if (item.Value > upperBound)
                 upperBound = item.Value;
@@ -246,6 +228,47 @@ public class PlotBars : MonoBehaviour {
         yMax = eachSegHeight * ticks;
 
         return yMax;
+    }
+
+    public Dictionary<string, float> ReadGraphValues()
+    {
+        Dictionary<string, float> new_data_set = new Dictionary<string, float>();
+
+        foreach (Transform t_child in transform)
+        {
+            GameObject child_obj = t_child.gameObject;
+            if(child_obj.tag == "Bar")
+            {
+                float newHeight = child_obj.transform.localScale.y;
+                float newValue = newHeight * yMax;
+                //Debug.Log(child_obj.name + " has new value of " + newValue.ToString());
+
+                new_data_set.Add(child_obj.name, newValue);
+            }
+            else
+            {
+                continue;
+            }
+        }
+        return new_data_set;
+    }
+
+    public void resetBarGraph(Dictionary<string, float> original_set)
+    {
+        foreach(var item in original_set)
+        {
+            GameObject bar_obj = GameObject.Find(item.Key);
+            float bar_height = item.Value / yMax;
+
+            Vector3 lastscale = bar_obj.transform.localScale;
+            bar_obj.transform.localScale = new Vector3(lastscale.x, bar_height, lastscale.z);
+
+            var yPos = -0.5f + (bar_height / 2);
+            Vector3 lastPos = bar_obj.transform.localPosition;
+            bar_obj.transform.localPosition = new Vector3(lastPos.x, yPos, lastPos.z);
+
+        }
+
     }
 	
 	

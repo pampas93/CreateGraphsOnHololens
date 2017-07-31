@@ -7,26 +7,45 @@ using System.Text;
 
 public class ReadCSV : MonoBehaviour {
 
-    [SerializeField]
-    private string relativeFilePath = "Assets/Resources/SampleCsvForUnity.csv";
+    public static ReadCSV instance;
 
-    public string[] AddIntoDictionary()
+    [Tooltip("The Titles of the data")]
+    [HideInInspector]
+    public string[] titles = { "", "" };
+
+    [Tooltip("Original data in dictionary format")]
+    [HideInInspector]
+    public Dictionary<string, float> data_set;
+
+    //[Tooltip("The new data, which is used when export option or transformed.")]
+    //public Dictionary<string, float> new_data_set;
+
+    [Tooltip("The path of csv file")]
+    string relativeFilePath = "Assets/Resources/SampleCsvForUnity.csv";
+    
+    private void Awake()
+    {
+        instance = this;      
+    }
+
+    private void Start()
+    {
+        AddIntoDictionary();
+    }
+
+    private void AddIntoDictionary()
     {
         bool readTitles = false;
-        string[] titles = { "", "" };
 
-        Dictionary<string, float> data_set = new Dictionary<string, float>();
+        data_set = new Dictionary<string, float>();
 
-        relativeFilePath = "Assets/Resources/SampleCsvForUnity.csv";
         Debug.Log("Reading Data from " + relativeFilePath);
 
-        // convert string to stream
-        byte[] byteArray = Encoding.UTF8.GetBytes(relativeFilePath);
-        //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
-        MemoryStream stream = new MemoryStream(byteArray);
-        // convert stream to string
+        //// convert string to stream
+        //byte[] byteArray = Encoding.UTF8.GetBytes(relativeFilePath);
+        //MemoryStream stream = new MemoryStream(byteArray);
 
-        using (var reader = new StreamReader(stream))
+        using (var reader = new StreamReader(relativeFilePath))
         {
             while (!reader.EndOfStream)
             {
@@ -46,9 +65,15 @@ public class ReadCSV : MonoBehaviour {
                 }
             }
         }
+    }
 
-        PlotBars.data_set = data_set;
+    public Dictionary<string, float> returnOriginalDataSet()
+    {
+        return data_set;
+    }
 
+    public string[] returnTitles()
+    {
         return titles;
     }
 

@@ -321,8 +321,11 @@
     <Compile Include="Assets\HoloToolkit\Utilities\Scripts\VectorRollingStatistics.cs" />
     <Compile Include="Assets\HoloToolkit\Utilities\Scripts\WorldAnchorManager.cs" />
     <Compile Include="Assets\HoloToolkit\Utilities\Shaders\FastConfigurable\Scripts\CalibrationSpace.cs" />
+    <Compile Include="Assets\Scripts\ExportToCsv.cs" />
+    <Compile Include="Assets\Scripts\MenuScript.cs" />
     <Compile Include="Assets\Scripts\PlotBars.cs" />
     <Compile Include="Assets\Scripts\ReadCSV.cs" />
+    <Compile Include="Assets\Scripts\ResetCsv.cs" />
     <Compile Include="Assets\Scripts\editComponent.cs" />
   </ItemGroup>
   <ItemGroup>
