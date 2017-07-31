@@ -15,6 +15,9 @@ public class PlotBars : MonoBehaviour {
 
     private string[] titles;
 
+    [SerializeField]
+    Material offFocusMaterial;
+
     [Tooltip("Setting enables reading data from csv file")]
     public bool ReadFromCSV = false;
 
@@ -151,7 +154,9 @@ public class PlotBars : MonoBehaviour {
             //Debug.Log(item.Key + "  " + item.Value);
             GameObject bar = GameObject.CreatePrimitive(PrimitiveType.Cube);
             bar.transform.parent = this.gameObject.transform;
-            bar.name = item.Key;
+            bar.name = item.Key + " with " + titles[1] + ": " + item.Value;
+            bar.tag = "Bar";
+            bar.GetComponent<Renderer>().material = offFocusMaterial;
 
             float bar_height = item.Value / yMax;
             
@@ -181,7 +186,9 @@ public class PlotBars : MonoBehaviour {
         {
             GameObject bar = GameObject.CreatePrimitive(PrimitiveType.Cube);
             bar.transform.parent = this.gameObject.transform;
-            bar.name = item.Key;
+            bar.name = item.Key + " with " + titles[1] + ": " + item.Value; 
+            bar.tag = "Bar";
+            bar.GetComponent<Renderer>().material = offFocusMaterial;
 
             float bar_height = item.Value / yMax;
 

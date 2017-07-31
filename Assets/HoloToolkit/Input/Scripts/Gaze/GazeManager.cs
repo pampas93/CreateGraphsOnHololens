@@ -97,6 +97,10 @@ namespace HoloToolkit.Unity.InputModule
         /// </summary>
         private List<RaycastResult> raycastResultList = new List<RaycastResult>();
 
+        GameObject barText;
+        Material offFocus;
+        Material onFocus;
+
         protected override void Awake()
         {
             base.Awake();
@@ -110,6 +114,10 @@ namespace HoloToolkit.Unity.InputModule
 
         private void Start()
         {
+            barText = GameObject.Find("HoloLensCamera/BarText");
+            onFocus = Resources.Load("Materials/onFocus", typeof(Material)) as Material;
+            offFocus = Resources.Load("Materials/offFocus", typeof(Material)) as Material;
+
             if (GazeTransform == null)
             {
                 if (Camera.main != null)
@@ -121,6 +129,7 @@ namespace HoloToolkit.Unity.InputModule
                     Debug.LogError("Gaze Manager was not given a GazeTransform and no main camera exists to default to.");
                 }
             }
+            
         }
 
         private void Update()
@@ -146,6 +155,17 @@ namespace HoloToolkit.Unity.InputModule
             if (previousFocusObject != HitObject && FocusedObjectChanged != null)
             {
                 FocusedObjectChanged(previousFocusObject, HitObject);
+
+                if(HitObject.tag == "Bar")
+                {
+                    barText.GetComponent<TextMesh>().text = HitObject.name;
+                    HitObject.GetComponent<Renderer>().material = onFocus;
+                }
+                if(previousFocusObject.tag == "Bar")
+                {
+                    barText.GetComponent<TextMesh>().text = "";
+                    previousFocusObject.GetComponent<Renderer>().material = offFocus;
+                }
             }
         }
 
@@ -313,9 +333,9 @@ namespace HoloToolkit.Unity.InputModule
                 }
             }
 
-             return minHit ?? new RaycastResult();
+            return minHit ?? new RaycastResult();
         }
-        
+
         /// <summary>
         /// Look through the layerMaskList and find the index in that list for which the supplied layer is part of
         /// </summary>
