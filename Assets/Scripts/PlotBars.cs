@@ -189,6 +189,7 @@ public class PlotBars : MonoBehaviour {
             bar.name = item.Key + " with " + titles[1] + ": " + item.Value; 
             bar.tag = "Bar";
             bar.GetComponent<Renderer>().material = offFocusMaterial;
+            bar.AddComponent<editComponent>();
 
             float bar_height = item.Value / yMax;
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System;
+using System.Text;
 
 public class ReadCSV : MonoBehaviour {
 
@@ -19,7 +20,13 @@ public class ReadCSV : MonoBehaviour {
         relativeFilePath = "Assets/Resources/SampleCsvForUnity.csv";
         Debug.Log("Reading Data from " + relativeFilePath);
 
-        using (var reader = new StreamReader(relativeFilePath))
+        // convert string to stream
+        byte[] byteArray = Encoding.UTF8.GetBytes(relativeFilePath);
+        //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
+        MemoryStream stream = new MemoryStream(byteArray);
+        // convert stream to string
+
+        using (var reader = new StreamReader(stream))
         {
             while (!reader.EndOfStream)
             {

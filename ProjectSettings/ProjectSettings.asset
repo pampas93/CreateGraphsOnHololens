@@ -509,11 +509,11 @@ PlayerSettings:
   m_MobileRenderingPath: 1
   metroPackageName: CreateGraph_Hololens
   metroPackageVersion: 
-  metroCertificatePath: 
+  metroCertificatePath: D:\Unity Projects\CreateGraph_Hololens\Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
+  metroCertificateSubject: DefaultCompany
+  metroCertificateIssuer: DefaultCompany
+  metroCertificateNotAfter: 0018380e1b29d401
   metroApplicationDescription: CreateGraph_Hololens
   wsaImages: {}
   metroTileShortName: 
