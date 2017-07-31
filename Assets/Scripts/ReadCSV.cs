@@ -21,7 +21,7 @@ public class ReadCSV : MonoBehaviour {
     //public Dictionary<string, float> new_data_set;
 
     [Tooltip("The path of csv file")]
-    string relativeFilePath = "Assets/Resources/SampleCsvForUnity.csv";
+    string relativeFilePath = "Assets/Resources/SampleData.csv";
     
     private void Awake()
     {
@@ -41,28 +41,48 @@ public class ReadCSV : MonoBehaviour {
 
         Debug.Log("Reading Data from " + relativeFilePath);
 
-        //// convert string to stream
+        // convert string to stream
         //byte[] byteArray = Encoding.UTF8.GetBytes(relativeFilePath);
         //MemoryStream stream = new MemoryStream(byteArray);
 
-        using (var reader = new StreamReader(relativeFilePath))
-        {
-            while (!reader.EndOfStream)
-            {
-                var line = reader.ReadLine();
-                var values = line.Split(',');
 
-                if (!readTitles)    //if readTitles = false, I capture the titles first (since first line of csv always has titles)
-                {
-                    titles[0] = values[0];
-                    titles[1] = values[1];
-                    readTitles = true;
-                }
-                else             //Capture store into dictionary
-                {
-                    float tempValue = (float)Convert.ToDouble(values[1]);
-                    data_set.Add(values[0], tempValue);
-                }
+        //using (var reader = new StreamReader(relativeFilePath))
+        //{
+        //    while (!reader.EndOfStream)
+        //    {
+        //        var line = reader.ReadLine();
+        //        var values = line.Split(',');
+
+        //        if (!readTitles)    //if readTitles = false, I capture the titles first (since first line of csv always has titles)
+        //        {
+        //            titles[0] = values[0];
+        //            titles[1] = values[1];
+        //            readTitles = true;
+        //        }
+        //        else             //Capture store into dictionary
+        //        {
+        //            float tempValue = (float)Convert.ToDouble(values[1]);
+        //            data_set.Add(values[0], tempValue);
+        //        }
+        //    }
+        //}
+
+        TextAsset csvData = Resources.Load("SampleData") as TextAsset;
+        var lines = csvData.text.Split("\n"[0]);
+        foreach(string line in lines)
+        {
+            var values = line.Split(',');
+
+            if (!readTitles)    //if readTitles = false, I capture the titles first (since first line of csv always has titles)
+            {
+                titles[0] = values[0];
+                titles[1] = values[1];
+                readTitles = true;
+            }
+            else             //Capture store into dictionary
+            {
+                float tempValue = (float)Convert.ToDouble(values[1]);
+                data_set.Add(values[0], tempValue);
             }
         }
     }

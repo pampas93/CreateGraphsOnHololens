@@ -101,6 +101,8 @@ namespace HoloToolkit.Unity.InputModule
         Material offFocus;
         Material onFocus;
 
+        private string[] titles;
+
         protected override void Awake()
         {
             base.Awake();
@@ -117,6 +119,8 @@ namespace HoloToolkit.Unity.InputModule
             barText = GameObject.Find("HoloLensCamera/BarText");
             onFocus = Resources.Load("Materials/onFocus", typeof(Material)) as Material;
             offFocus = Resources.Load("Materials/offFocus", typeof(Material)) as Material;
+
+            titles = ReadCSV.instance.returnTitles();
 
             if (GazeTransform == null)
             {
@@ -156,12 +160,17 @@ namespace HoloToolkit.Unity.InputModule
             {
                 FocusedObjectChanged(previousFocusObject, HitObject);
 
-                if(HitObject.tag == "Bar")
+                if(HitObject != null && HitObject.tag == "Bar")
                 {
-                    barText.GetComponent<TextMesh>().text = HitObject.name;
+                    float value = PlotBars.instance.getUpdatedValue(HitObject);
+
+                    string text = titles[0] + " : " + HitObject.name + "\n" + titles[1] + " : " + value.ToString("0.00");
+
+                    barText.GetComponent<TextMesh>().text = text;
                     HitObject.GetComponent<Renderer>().material = onFocus;
                 }
-                if(previousFocusObject.tag == "Bar")
+              
+                if(previousFocusObject != null && previousFocusObject.tag == "Bar")
                 {
                     barText.GetComponent<TextMesh>().text = "";
                     previousFocusObject.GetComponent<Renderer>().material = offFocus;

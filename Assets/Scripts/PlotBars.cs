@@ -230,6 +230,16 @@ public class PlotBars : MonoBehaviour {
         return yMax;
     }
 
+    public float getUpdatedValue(GameObject obj)
+    {
+        float value;
+
+        var height = obj.transform.localScale.y;
+        value = height * yMax;
+
+        return value;
+    }
+
     public Dictionary<string, float> ReadGraphValues()
     {
         Dictionary<string, float> new_data_set = new Dictionary<string, float>();
